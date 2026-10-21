@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include <BinaryData.h>
 
 namespace
 {
@@ -143,9 +144,18 @@ void RiserLabEditor::paint (juce::Graphics& g)
 {
     g.fillAll (kBackground);
 
+    auto titleTextArea = titleArea;
+    auto logoArea = titleTextArea.removeFromRight (64).reduced (2);
+
     g.setColour (juce::Colours::white);
     g.setFont (22.0f);
-    g.drawText ("RiserLab", titleArea, juce::Justification::centredLeft);
+    g.drawText ("RiserLab", titleTextArea, juce::Justification::centredLeft);
+
+    const auto logo = juce::ImageFileFormat::loadFrom (BinaryData::CrayLDRLogo_png,
+                                                        (size_t) BinaryData::CrayLDRLogo_pngSize);
+    if (logo.isValid())
+        g.drawImageWithin (logo, logoArea.getX(), logoArea.getY(), logoArea.getWidth(),
+                           logoArea.getHeight(), juce::RectanglePlacement::centred);
 }
 
 void RiserLabEditor::resized()
