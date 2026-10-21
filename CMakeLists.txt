@@ -21,6 +21,23 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(JUCE)
 
+# Descargar el logo público para incrustarlo en la interfaz del plugin.
+set(CRAY_LDR_LOGO "${CMAKE_CURRENT_BINARY_DIR}/CrayLDRLogo.png")
+file(DOWNLOAD
+    "https://raw.githubusercontent.com/elcrayldr/logo/main/IMG_7425.PNG"
+    "${CRAY_LDR_LOGO}"
+    STATUS CRAY_LDR_LOGO_DOWNLOAD_STATUS
+    TLS_VERIFY ON
+)
+list(GET CRAY_LDR_LOGO_DOWNLOAD_STATUS 0 CRAY_LDR_LOGO_DOWNLOAD_CODE)
+if(NOT CRAY_LDR_LOGO_DOWNLOAD_CODE EQUAL 0)
+    message(FATAL_ERROR "No se pudo descargar el logo de CRAY LDR: ${CRAY_LDR_LOGO_DOWNLOAD_STATUS}")
+endif()
+
+juce_add_binary_data(RiserLabAssets
+    SOURCES "${CRAY_LDR_LOGO}"
+)
+
 if(APPLE)
     set(RISERLAB_FORMATS VST3 AU Standalone)
 else()
@@ -28,12 +45,12 @@ else()
 endif()
 
 juce_add_plugin(RiserLab
-    COMPANY_NAME "RiserLab"
+    COMPANY_NAME "CRAY LDR"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
-    PLUGIN_MANUFACTURER_CODE Rslb
+    PLUGIN_MANUFACTURER_CODE CrLd
     PLUGIN_CODE Rslp
     FORMATS ${RISERLAB_FORMATS}
     PRODUCT_NAME "RiserLab"
@@ -62,6 +79,7 @@ endif()
 target_link_libraries(RiserLab
     PRIVATE
         juce::juce_audio_utils
+        RiserLabAssets
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
