@@ -12,7 +12,7 @@ namespace
     const Preset kPresets[] =
     {
         { "Cl\xc3\xa1sico",         0.80f, 0.40f, 3.0f, 0.60f, 0.00f, 0.00f, 0.00f, 0.0f },
-        { "Et\xc3\xa9reo",          1.00f, 0.20f, 5.0f, 0.70f, 0.30f, 0.00f, 0.25f, 0.0f },
+        { "Est\xc3\xa9reo",          1.00f, 0.20f, 5.0f, 0.70f, 0.30f, 0.00f, 0.25f, 0.0f },
         { "Oscuro saturado",        0.60f, 0.80f, 2.5f, 0.50f, 0.00f, 0.60f, 0.00f, 0.0f },
         { "Eco brillante",          0.70f, 0.30f, 3.5f, 0.80f, 0.60f, 0.10f, 0.50f, 0.0f }
     };
