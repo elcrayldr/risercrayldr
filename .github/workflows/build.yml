@@ -1,0 +1,37 @@
+name: Build RiserLab VST3
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Download source code
+        uses: actions/checkout@v4
+
+      - name: Configure project
+        run: cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile VST3
+        run: cmake --build build --config Release --target RiserLab_VST3 --parallel 2
+
+      - name: Package plugin
+        shell: pwsh
+        run: |
+          $plugin = Get-ChildItem -Path build -Recurse -Directory -Filter 'RiserLab.vst3' | Select-Object -First 1
+          if (-not $plugin) { throw 'RiserLab.vst3 was not found after build.' }
+          Compress-Archive -Path $plugin.FullName -DestinationPath 'RiserLab-Windows-x64-VST3.zip' -Force
+
+      - name: Upload compiled plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: RiserLab-Windows-x64-VST3
+          path: RiserLab-Windows-x64-VST3.zip
+          if-no-files-found: error
+          retention-days: 14
