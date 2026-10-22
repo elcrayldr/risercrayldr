@@ -303,7 +303,8 @@ void RiserLabEditor::onCaptureClicked()
 void RiserLabEditor::onGenerateClicked()
 {
     proc.stopCapture();
-    captureButton.setButtonText (TXT (kCaptureIdle));
+    captureButton.active = false;
+    captureButton.repaint();
 
     juce::String error;
     if (proc.generateRiser (error))
