@@ -18,6 +18,13 @@ private:
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
     using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
 
+    struct CaptureControl : public juce::Button
+    {
+        CaptureControl() : juce::Button ("Capture") {}
+        void paintButton (juce::Graphics&, bool highlighted, bool pressed) override;
+        bool active = false;
+    };
+
     struct DragArea : public juce::Component
     {
         void setData (std::vector<float> newPeaks, const juce::File& newFile);
@@ -41,7 +48,8 @@ private:
 
     RiserLabProcessor& proc;
 
-    juce::TextButton captureButton, generateButton;
+    CaptureControl captureButton;
+    juce::TextButton generateButton;
     juce::Label statusLabel;
     juce::ComboBox presetBox, reverbTypeBox;
     juce::ToggleButton reverbToggle, cutToggle;
