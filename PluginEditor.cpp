@@ -4,62 +4,70 @@
 
 namespace
 {
-    const juce::Colour kAccent       (0xff2e4b60);
-    const juce::Colour kAccentBright (0xff3c9e91);
-    const juce::Colour kBackground   (0xffe9edec);
-    const juce::Colour kPanel        (0xfff5f7f6);
-    const juce::Colour kBorder       (0xffc7d1d5);
-    const juce::Colour kInk          (0xff2e4b60);
-    const juce::Colour kMuted        (0xff8297a5);
+    const juce::Colour kAccent       (0xff8b5cf6);
+    const juce::Colour kAccentBright (0xff22d3ee);
+    const juce::Colour kBackground   (0xff090c12);
+    const juce::Colour kPanel        (0xff111722);
+    const juce::Colour kBorder       (0xff263345);
+    const juce::Colour kInk          (0xffe8f0fb);
+    const juce::Colour kMuted        (0xff8293a8);
 
     struct KnobDef { const char* id; const char* name; };
 
     const KnobDef kKnobDefs[] =
     {
-        { "size",       "TAMAÑO" },
-        { "damping",    "ABSORCIÓN" },
-        { "length",     "DURACIÓN" },
+        { "size",       "SIZE" },
+        { "damping",    "DAMPING" },
+        { "length",     "LENGTH" },
         { "deess",      "DE-ESSER" },
         { "lowCut",     "LOW CUT" },
         { "highCut",    "HIGH CUT" },
-        { "drive",      "SATURACIÓN" },
-        { "echo",       "ECO" },
-        { "dry",        "VOZ SECA" },
+        { "drive",      "DRIVE" },
+        { "echo",       "ECHO" },
+        { "dry",        "DRY VOICE" },
         { "reverbMix",  "REVERB MIX" },
-        { "tremoloRate","TREMOLO" }
+        { "tremoloRate","TREMOLO RATE" }
     };
-
-    const char* kCaptureIdle = "\xe2\x97\x8f  Capturar";
-    const char* kCaptureActive = "\xe2\x96\xa0  Parar";
 }
 
 void RiserLabEditor::CaptureControl::paintButton (juce::Graphics& g, bool highlighted, bool pressed)
 {
     auto b = getLocalBounds().toFloat();
-    const float d = juce::jmin (b.getWidth(), b.getHeight()) - 10.0f;
-    auto circle = juce::Rectangle<float> (d, d).withCentre (b.getCentre());
+    auto r = b.reduced (3.0f);
 
-    g.setColour (juce::Colour (0x180e2634));
-    g.fillEllipse (circle.translated (0.0f, 5.0f));
-    g.setColour (kBorder);
-    g.drawEllipse (circle.expanded (5.0f), 1.2f);
-    g.setColour (active ? juce::Colour (0xffd9ebe6) : juce::Colour (0xfff8faf9));
-    g.fillEllipse (circle);
-    g.setColour (highlighted ? juce::Colour (0xff45667c) : kAccent);
-    g.drawEllipse (circle, pressed ? 3.0f : 2.0f);
+    g.setColour (juce::Colour (0x4022d3ee));
+    g.drawRoundedRectangle (r.expanded (3.0f), 18.0f, 1.0f);
+    g.setColour (juce::Colour (0xff111a27));
+    g.fillRoundedRectangle (r, 16.0f);
+    g.setColour (highlighted ? kAccentBright : kBorder);
+    g.drawRoundedRectangle (r, 16.0f, pressed ? 2.2f : 1.2f);
 
-    auto inner = circle.reduced (13.0f);
+    auto centre = r.getCentre();
+    g.setColour (juce::Colour (0xff1a2738));
+    g.fillEllipse (juce::Rectangle<float> (68.0f, 68.0f).withCentre (centre));
+
+    g.setColour (active ? kAccentBright : kAccent);
+    g.drawEllipse (juce::Rectangle<float> (68.0f, 68.0f).withCentre (centre), 2.0f);
+
     g.setColour (kMuted);
-    g.setFont (juce::Font (12.0f, juce::Font::bold));
-    g.drawFittedText ("RISER-Z", inner.removeFromTop (inner.getHeight() * 0.36f).toNearestInt(),
+    g.setFont (juce::Font (10.0f, juce::Font::bold));
+    g.drawFittedText ("RISER / INPUT", juce::Rectangle<int> ((int) centre.x - 58, (int) centre.y - 43, 116, 16),
                       juce::Justification::centred, 1);
+
     g.setColour (kInk);
-    g.setFont (juce::Font (active ? 16.0f : 19.0f, juce::Font::bold));
-    g.drawFittedText (active ? "STOP" : "CAPTURE", inner.toNearestInt(),
+    g.setFont (juce::Font (active ? 13.0f : 14.0f, juce::Font::bold));
+    g.drawFittedText (active ? "STOP" : "CAPTURE",
+                      juce::Rectangle<int> ((int) centre.x - 62, (int) centre.y - 18, 124, 30),
                       juce::Justification::centred, 1);
-    g.setColour (active ? juce::Colour (0xffbd5c61) : kAccentBright);
-    g.fillEllipse (juce::Rectangle<float> (7.0f, 7.0f)
-                       .withCentre ({ circle.getCentreX(), circle.getBottom() - 20.0f }));
+
+    g.setColour (active ? juce::Colour (0xffff637d) : kAccentBright);
+    g.fillEllipse (juce::Rectangle<float> (5.0f, 5.0f).withCentre ({ centre.x, centre.y + 42.0f }));
+
+    g.setColour (kMuted);
+    g.setFont (juce::Font (9.0f));
+    g.drawFittedText (active ? "CAPTURE ACTIVE" : "READY TO CAPTURE",
+                      juce::Rectangle<int> ((int) centre.x - 68, (int) centre.y + 49, 136, 14),
+                      juce::Justification::centred, 1);
 }
 
 void RiserLabEditor::DragArea::setData (std::vector<float> newPeaks, const juce::File& newFile)
@@ -73,24 +81,24 @@ void RiserLabEditor::DragArea::paint (juce::Graphics& g)
 {
     auto r = getLocalBounds().toFloat();
     g.setColour (kPanel);
-    g.fillRoundedRectangle (r, 10.0f);
+    g.fillRoundedRectangle (r, 8.0f);
     g.setColour (kBorder);
-    g.drawRoundedRectangle (r.reduced (0.5f), 10.0f, 1.0f);
+    g.drawRoundedRectangle (r.reduced (0.5f), 8.0f, 1.0f);
 
     if (peaks.empty())
     {
-        g.setColour (kInk);
+        g.setColour (kAccentBright);
         g.setFont (juce::Font (12.0f, juce::Font::bold));
-        g.drawText (TXT ("ARRASTRA EL RISER A TU DAW"),
+        g.drawText (TXT ("DRAG & DROP  /  DAW EXPORT"),
                     getLocalBounds().removeFromTop (24), juce::Justification::centred);
         g.setColour (kMuted);
         g.setFont (11.0f);
-        g.drawText (TXT ("La forma de onda aparecerá aquí al generar"),
+        g.drawText (TXT ("WAVEFORM PREVIEW  •  GENERATE TO EXPORT"),
                     getLocalBounds().withTrimmedTop (22), juce::Justification::centred);
         return;
     }
 
-    g.setColour (kAccent);
+    g.setColour (kAccentBright);
     const float mid = r.getCentreY();
     const float h = r.getHeight() * 0.36f;
 
@@ -130,7 +138,7 @@ RiserLabEditor::RiserLabEditor (RiserLabProcessor& p)
     presetBox.onChange = [this] { proc.setCurrentProgram (presetBox.getSelectedItemIndex()); };
     presetBox.setColour (juce::ComboBox::backgroundColourId, kPanel);
     presetBox.setColour (juce::ComboBox::outlineColourId, kBorder);
-    presetBox.setColour (juce::ComboBox::textColourId, juce::Colours::white);
+    presetBox.setColour (juce::ComboBox::textColourId, kInk);
     addAndMakeVisible (presetBox);
 
     captureButton.onClick = [this] { onCaptureClicked(); };
@@ -169,12 +177,12 @@ RiserLabEditor::RiserLabEditor (RiserLabProcessor& p)
         auto& k = knobs[i];
         k.slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
         k.slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 76, 17);
-        k.slider.setColour (juce::Slider::rotarySliderFillColourId, kAccent);
+        k.slider.setColour (juce::Slider::rotarySliderFillColourId, kAccentBright);
         k.slider.setColour (juce::Slider::rotarySliderOutlineColourId, kBorder);
         k.slider.setColour (juce::Slider::thumbColourId, kAccentBright);
         k.slider.setColour (juce::Slider::textBoxTextColourId, kInk);
-        k.slider.setColour (juce::Slider::textBoxBackgroundColourId, kBackground);
-        k.slider.setColour (juce::Slider::textBoxOutlineColourId, kBorder);
+        k.slider.setColour (juce::Slider::textBoxBackgroundColourId, kPanel);
+        k.slider.setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
         k.slider.setScrollWheelEnabled (false);
 
         const juce::String id (kKnobDefs[i].id);
@@ -222,13 +230,20 @@ RiserLabEditor::~RiserLabEditor()
 void RiserLabEditor::paint (juce::Graphics& g)
 {
     g.fillAll (kBackground);
+
+    auto header = getLocalBounds().reduced (18).removeFromTop (38);
+    g.setColour (kBorder);
+    g.drawLine ((float) header.getX(), (float) header.getBottom() + 3.0f,
+                (float) getWidth() - 18.0f, (float) header.getBottom() + 3.0f, 1.0f);
+
     g.setColour (kInk);
-    g.setFont (juce::Font (23.0f, juce::Font::bold));
+    g.setFont (juce::Font (22.0f, juce::Font::bold));
     g.drawText ("RISER", titleArea, juce::Justification::centredLeft);
     g.setColour (kAccentBright);
     auto title2 = titleArea;
     title2.setX (title2.getX() + 76);
-    title2.setWidth (95);
+    title2.setWidth (110);
+    g.setFont (juce::Font (22.0f, juce::Font::bold));
     g.drawText ("CRAY LDR", title2, juce::Justification::centredLeft);
 
     if (logoImage.isValid())
@@ -250,11 +265,11 @@ void RiserLabEditor::resized()
     area.removeFromTop (5);
 
     auto hero = area.removeFromTop (202);
-    const int d = juce::jmin (158, hero.getWidth() / 3);
+    const int d = juce::jmin (176, hero.getWidth() / 3);
     captureButton.setBounds (juce::Rectangle<int> (d, d)
-                                 .withCentre ({ hero.getCentreX(), hero.getY() + 83 }));
-    statusLabel.setBounds (hero.getX(), hero.getY() + 164, hero.getWidth(), 17);
-    generateButton.setBounds (juce::Rectangle<int> (142, 27)
+                                 .withCentre ({ hero.getCentreX(), hero.getY() + 86 }));
+    statusLabel.setBounds (hero.getX(), hero.getY() + 173, hero.getWidth(), 17);
+    generateButton.setBounds (juce::Rectangle<int> (160, 28)
                                   .withCentre ({ hero.getCentreX(), hero.getBottom() - 1 }));
 
     auto reverbRow = area.removeFromTop (30);
