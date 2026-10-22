@@ -12,7 +12,13 @@ struct RiserSettings
     float damping = 0.4f;      // absorcion de agudos
     float tailSeconds = 3.0f;  // duracion del riser
     float deess = 0.6f;        // cantidad de reduccion de sibilancia
-    float sweep = 0.0f;        // barrido de filtro pasa-altos
+    float lowCutHz = 20.0f;
+    float highCutHz = 20000.0f;
+    float reverbMix = 1.0f;
+    int reverbType = 0;
+    bool reverbEnabled = true;
+    int tremoloRate = 0;
+    double tempoBpm = 120.0;
     float drive = 0.0f;        // saturacion
     float echo = 0.0f;         // eco
     float dry = 0.0f;          // voz original mezclada (solo si no se corta)
@@ -101,22 +107,84 @@ namespace RiserEngine
         }
     }
 
-    // Reverb solo "mojado" sobre todo el buffer (estereo).
-    inline void applyReverb (juce::AudioBuffer<float>& b, double sr, float size, float damping)
+    // Tres voicings Hall/Plate/Room, con mezcla dry/wet.
+    inline void applyReverb (juce::AudioBuffer<float>& b, double sr, const RiserSettings& s)
     {
+        if (! s.reverbEnabled || s.reverbMix <= 0.0001f)
+            return;
+
+        juce::AudioBuffer<float> dry;
+        dry.makeCopyOf (b);
+
         juce::Reverb rv;
         rv.setSampleRate (sr);
-
         juce::Reverb::Parameters p;
-        p.roomSize = size;
-        p.damping = damping;
+        p.roomSize = s.size;
+        p.damping = s.damping;
         p.wetLevel = 1.0f;
         p.dryLevel = 0.0f;
         p.width = 1.0f;
         p.freezeMode = 0.0f;
-        rv.setParameters (p);
 
+        if (s.reverbType == 1) // Plate: brillante y denso
+        {
+            p.roomSize = juce::jlimit (0.45f, 0.85f, s.size);
+            p.damping = juce::jlimit (0.05f, 0.35f, s.damping * 0.45f);
+            p.width = 0.90f;
+        }
+        else if (s.reverbType == 2) // Room: corto y controlado
+        {
+            p.roomSize = juce::jlimit (0.15f, 0.48f, s.size * 0.48f);
+            p.damping = juce::jlimit (0.45f, 0.90f, 0.45f + s.damping * 0.45f);
+            p.width = 0.70f;
+        }
+
+        rv.setParameters (p);
         rv.processStereo (b.getWritePointer (0), b.getWritePointer (1), b.getNumSamples());
+        const float mix = juce::jlimit (0.0f, 1.0f, s.reverbMix);
+
+        for (int ch = 0; ch < b.getNumChannels(); ++ch)
+        {
+            float* wetData = b.getWritePointer (ch);
+            const float* dryData = dry.getReadPointer (ch);
+            for (int i = 0; i < b.getNumSamples(); ++i)
+                wetData[i] = dryData[i] * (1.0f - mix) + wetData[i] * mix;
+        }
+    }
+
+    inline void applyFilters (juce::AudioBuffer<float>& b, double sr, float lowCutHz, float highCutHz)
+    {
+        const double maxCut = sr * 0.45;
+        const double low = juce::jlimit (20.0, maxCut - 1.0, (double) lowCutHz);
+        const double high = juce::jlimit (low + 1.0, maxCut, (double) highCutHz);
+
+        for (int ch = 0; ch < b.getNumChannels(); ++ch)
+        {
+            float* data = b.getWritePointer (ch);
+            juce::IIRFilter hp, lp;
+            hp.setCoefficients (juce::IIRCoefficients::makeHighPass (sr, low));
+            lp.setCoefficients (juce::IIRCoefficients::makeLowPass (sr, high));
+            hp.processSamples (data, b.getNumSamples());
+            lp.processSamples (data, b.getNumSamples());
+        }
+    }
+
+    inline void applyTremolo (juce::AudioBuffer<float>& b, double sr, const RiserSettings& s)
+    {
+        const int division = (s.tremoloRate == 0 ? 16 : s.tremoloRate == 1 ? 8 : s.tremoloRate == 2 ? 4 : 2);
+        const double bpm = juce::jlimit (20.0, 300.0, s.tempoBpm);
+        const double cyclesPerSecond = bpm / 60.0 * (4.0 / (double) division);
+        const double phaseStep = juce::MathConstants<double>::twoPi * cyclesPerSecond / sr;
+        const float depth = 0.65f;
+        const int n = b.getNumSamples();
+
+        for (int i = 0; i < n; ++i)
+        {
+            const float lfo = (float) (0.5 - 0.5 * std::cos (phaseStep * i));
+            const float gain = 1.0f - depth * lfo;
+            for (int ch = 0; ch < b.getNumChannels(); ++ch)
+                b.getWritePointer (ch)[i] *= gain;
+        }
     }
 
     // Filtro pasa-altos que sube de frecuencia a lo largo del riser.
@@ -248,7 +316,7 @@ namespace RiserEngine
                 wet.setSample (ch, i, src.getSample (ch, n - 1 - i));
 
         // 2) reverb
-        applyReverb (wet, sr, s.size, s.damping);
+        applyReverb (wet, sr, s);
 
         // 3) dar la vuelta otra vez
         for (int ch = 0; ch < 2; ++ch)
@@ -271,9 +339,10 @@ namespace RiserEngine
             out = std::move (wet);
         }
 
-        applySweep (out, sr, s.sweep);
+        applyFilters (out, sr, s.lowCutHz, s.highCutHz);
         applyDrive (out, s.drive);
         applyEcho (out, sr, s.echo);
+        applyTremolo (out, sr, s);
         finish (out, sr);
 
         return out;
