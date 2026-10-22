@@ -55,9 +55,9 @@ void RiserLabEditor::CaptureControl::paintButton (juce::Graphics& g, bool highli
                       juce::Justification::centred, 1);
 
     g.setColour (kInk);
-    g.setFont (juce::Font (active ? 13.0f : 14.0f, juce::Font::bold));
+    g.setFont (juce::Font (active ? 12.0f : 12.0f, juce::Font::bold));
     g.drawFittedText (active ? "STOP" : "CAPTURE",
-                      juce::Rectangle<int> ((int) centre.x - 62, (int) centre.y - 18, 124, 30),
+                      juce::Rectangle<int> ((int) centre.x - 54, (int) centre.y - 16, 108, 26),
                       juce::Justification::centred, 1);
 
     g.setColour (active ? juce::Colour (0xffff637d) : kAccentBright);
@@ -259,7 +259,8 @@ void RiserLabEditor::paint (juce::Graphics& g)
     g.setColour (kInk);
     g.setFont (juce::Font ("Arial", 25.0f, juce::Font::bold));
     g.drawText ("RISER", titleArea, juce::Justification::centredLeft);
-    auto lab = titleArea.withX (titleArea.getX() + 79).withWidth (76);
+    // Leave explicit separation between the two word marks to prevent glyph overlap.
+    auto lab = titleArea.withX (titleArea.getX() + 91).withWidth (68);
     g.setColour (kAccentBright);
     g.drawText ("LAB", lab, juce::Justification::centredLeft);
 
