@@ -16,8 +16,8 @@ public:
 private:
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
 
-    // Zona que muestra la onda del riser y permite arrastrarlo al DAW.
     struct DragArea : public juce::Component
     {
         void setData (std::vector<float> newPeaks, const juce::File& newFile);
@@ -43,13 +43,15 @@ private:
 
     juce::TextButton captureButton, generateButton;
     juce::Label statusLabel;
-    juce::ComboBox presetBox;
-    std::array<Knob, 8> knobs;
-    juce::ToggleButton cutToggle;
-    std::unique_ptr<ButtonAttachment> cutAttachment;
+    juce::ComboBox presetBox, reverbTypeBox;
+    juce::ToggleButton reverbToggle, cutToggle;
+    std::unique_ptr<ButtonAttachment> reverbAttachment, cutAttachment;
+    std::unique_ptr<ComboBoxAttachment> reverbTypeAttachment;
+    std::array<Knob, 11> knobs;
     DragArea dragArea;
+    juce::Image logoImage;
 
-    juce::Rectangle<int> titleArea;
+    juce::Rectangle<int> titleArea, logoArea;
     juce::String lastMessage;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RiserLabEditor)
