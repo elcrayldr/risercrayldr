@@ -49,25 +49,11 @@ void RiserLabEditor::CaptureControl::paintButton (juce::Graphics& g, bool highli
     g.setColour (active ? kAccentBright : kAccent);
     g.drawEllipse (juce::Rectangle<float> (68.0f, 68.0f).withCentre (centre), 2.0f);
 
-    g.setColour (kMuted);
-    g.setFont (juce::Font (10.0f, juce::Font::bold));
-    g.drawFittedText ("RISER / INPUT", juce::Rectangle<int> ((int) centre.x - 58, (int) centre.y - 43, 116, 16),
-                      juce::Justification::centred, 1);
-
+    // One label only: no secondary text or status indicators inside the capture circle.
     g.setColour (kInk);
-    // Compact label with fixed inner bounds so it stays inside the circular control.
-    g.setFont (juce::Font (10.5f, juce::Font::bold));
-    auto actionText = juce::Rectangle<int> ((int) centre.x - 35, (int) centre.y - 12, 70, 24);
-    g.drawFittedText (active ? "STOP" : "CAPTURE", actionText,
-                      juce::Justification::centred, 1);
-
-    g.setColour (active ? juce::Colour (0xffff637d) : kAccentBright);
-    g.fillEllipse (juce::Rectangle<float> (5.0f, 5.0f).withCentre ({ centre.x, centre.y + 42.0f }));
-
-    g.setColour (kMuted);
-    g.setFont (juce::Font (9.0f));
-    g.drawFittedText (active ? "CAPTURE ACTIVE" : "READY TO CAPTURE",
-                      juce::Rectangle<int> ((int) centre.x - 68, (int) centre.y + 49, 136, 14),
+    g.setFont (juce::Font (11.0f, juce::Font::bold));
+    auto actionText = juce::Rectangle<int> ((int) centre.x - 34, (int) centre.y - 12, 68, 24);
+    g.drawFittedText ("CAPTURE", actionText,
                       juce::Justification::centred, 1);
 }
 
@@ -260,23 +246,8 @@ void RiserLabEditor::paint (juce::Graphics& g)
     const juce::Font brandFont ("Arial", 25.0f, juce::Font::bold);
     g.setFont (brandFont);
     g.setColour (kInk);
-    const float brandX = (float) titleArea.getX();
-    const float brandY = (float) titleArea.getY();
-    const float riserWidth = brandFont.getStringWidthFloat ("RISER");
-    g.drawText ("RISER", juce::Rectangle<float> (brandX, brandY, riserWidth + 2.0f, 31.0f),
+    g.drawText ("RiserLab", titleArea,
                 juce::Justification::centredLeft, false);
-
-    // Place LAB after the measured width of RISER, with a deliberate gap.
-    const float labX = brandX + riserWidth + 9.0f;
-    g.setColour (kAccentBright);
-    g.drawText ("LAB", juce::Rectangle<float> (labX, brandY, 55.0f, 31.0f),
-                juce::Justification::centredLeft, false);
-
-    g.setColour (kMuted);
-    g.setFont (juce::Font (9.0f));
-    auto subtitle = titleArea.withY (titleArea.getY() + 31).withHeight (15);
-    g.drawText (TXT ("PRO VOICE / AUDIO RISER SYNTHESIZER"), subtitle,
-                juce::Justification::centredLeft);
 
     g.setColour (kAccentBright.withAlpha (0.85f));
     g.setFont (juce::Font (9.0f, juce::Font::bold));
