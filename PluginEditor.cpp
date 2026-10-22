@@ -55,9 +55,10 @@ void RiserLabEditor::CaptureControl::paintButton (juce::Graphics& g, bool highli
                       juce::Justification::centred, 1);
 
     g.setColour (kInk);
-    g.setFont (juce::Font (active ? 12.0f : 12.0f, juce::Font::bold));
-    g.drawFittedText (active ? "STOP" : "CAPTURE",
-                      juce::Rectangle<int> ((int) centre.x - 54, (int) centre.y - 16, 108, 26),
+    // Compact label with fixed inner bounds so it stays inside the circular control.
+    g.setFont (juce::Font (10.5f, juce::Font::bold));
+    auto actionText = juce::Rectangle<int> ((int) centre.x - 35, (int) centre.y - 12, 70, 24);
+    g.drawFittedText (active ? "STOP" : "CAPTURE", actionText,
                       juce::Justification::centred, 1);
 
     g.setColour (active ? juce::Colour (0xffff637d) : kAccentBright);
@@ -256,13 +257,20 @@ void RiserLabEditor::paint (juce::Graphics& g)
                            juce::RectanglePlacement::centred);
     }
 
+    const juce::Font brandFont ("Arial", 25.0f, juce::Font::bold);
+    g.setFont (brandFont);
     g.setColour (kInk);
-    g.setFont (juce::Font ("Arial", 25.0f, juce::Font::bold));
-    g.drawText ("RISER", titleArea, juce::Justification::centredLeft);
-    // Leave explicit separation between the two word marks to prevent glyph overlap.
-    auto lab = titleArea.withX (titleArea.getX() + 91).withWidth (68);
+    const float brandX = (float) titleArea.getX();
+    const float brandY = (float) titleArea.getY();
+    const float riserWidth = brandFont.getStringWidthFloat ("RISER");
+    g.drawText ("RISER", juce::Rectangle<float> (brandX, brandY, riserWidth + 2.0f, 31.0f),
+                juce::Justification::centredLeft, false);
+
+    // Place LAB after the measured width of RISER, with a deliberate gap.
+    const float labX = brandX + riserWidth + 9.0f;
     g.setColour (kAccentBright);
-    g.drawText ("LAB", lab, juce::Justification::centredLeft);
+    g.drawText ("LAB", juce::Rectangle<float> (labX, brandY, 55.0f, 31.0f),
+                juce::Justification::centredLeft, false);
 
     g.setColour (kMuted);
     g.setFont (juce::Font (9.0f));
