@@ -4,13 +4,13 @@
 
 namespace
 {
-    const juce::Colour kAccent       (0xff8b5cf6);
-    const juce::Colour kAccentBright (0xff22d3ee);
-    const juce::Colour kBackground   (0xff090c12);
-    const juce::Colour kPanel        (0xff111722);
-    const juce::Colour kBorder       (0xff263345);
+    const juce::Colour kAccent       (0xff7c5cff);
+    const juce::Colour kAccentBright (0xff42e8ff);
+    const juce::Colour kBackground   (0xff080b10);
+    const juce::Colour kPanel        (0xff101722);
+    const juce::Colour kBorder       (0xff202b3a);
     const juce::Colour kInk          (0xffe8f0fb);
-    const juce::Colour kMuted        (0xff8293a8);
+    const juce::Colour kMuted        (0xff8c9bb0);
 
     struct KnobDef { const char* id; const char* name; };
 
@@ -175,14 +175,14 @@ RiserLabEditor::RiserLabEditor (RiserLabProcessor& p)
     for (size_t i = 0; i < knobs.size(); ++i)
     {
         auto& k = knobs[i];
-        k.slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        k.slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 76, 17);
-        k.slider.setColour (juce::Slider::rotarySliderFillColourId, kAccentBright);
-        k.slider.setColour (juce::Slider::rotarySliderOutlineColourId, kBorder);
-        k.slider.setColour (juce::Slider::thumbColourId, kAccentBright);
+        k.slider.setSliderStyle (juce::Slider::LinearHorizontal);
+        k.slider.setTextBoxStyle (juce::Slider::TextBoxRight, false, 62, 22);
+        k.slider.setColour (juce::Slider::trackColourId, kAccentBright);
+        k.slider.setColour (juce::Slider::backgroundColourId, kBorder);
+        k.slider.setColour (juce::Slider::thumbColourId, kInk);
         k.slider.setColour (juce::Slider::textBoxTextColourId, kInk);
-        k.slider.setColour (juce::Slider::textBoxBackgroundColourId, kPanel);
-        k.slider.setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+        k.slider.setColour (juce::Slider::textBoxBackgroundColourId, juce::Colour (0xff151e2a));
+        k.slider.setColour (juce::Slider::textBoxOutlineColourId, kBorder);
         k.slider.setScrollWheelEnabled (false);
 
         const juce::String id (kKnobDefs[i].id);
@@ -237,14 +237,15 @@ void RiserLabEditor::paint (juce::Graphics& g)
                 (float) getWidth() - 18.0f, (float) header.getBottom() + 3.0f, 1.0f);
 
     g.setColour (kInk);
-    g.setFont (juce::Font (22.0f, juce::Font::bold));
-    g.drawText ("RISER", titleArea, juce::Justification::centredLeft);
+    g.setColour (kInk);
+    g.setFont (juce::Font (21.0f, juce::Font::bold));
+    g.drawText ("Riser", titleArea, juce::Justification::centredLeft);
     g.setColour (kAccentBright);
     auto title2 = titleArea;
-    title2.setX (title2.getX() + 76);
-    title2.setWidth (110);
-    g.setFont (juce::Font (22.0f, juce::Font::bold));
-    g.drawText ("CRAY LDR", title2, juce::Justification::centredLeft);
+    title2.setX (title2.getX() + 64);
+    title2.setWidth (130);
+    g.setFont (juce::Font (21.0f, juce::Font::bold));
+    g.drawText ("LAB", title2, juce::Justification::centredLeft);
 
     if (logoImage.isValid())
     {
@@ -259,8 +260,8 @@ void RiserLabEditor::resized()
 {
     auto area = getLocalBounds().reduced (18);
     auto header = area.removeFromTop (38);
-    logoArea = header.removeFromRight (48).reduced (2);
-    titleArea = header;
+    logoArea = header.removeFromLeft (42).reduced (1);
+    titleArea = header.removeFromLeft (190);
     presetBox.setBounds (area.getRight() - 170, 18, 152, 25);
     area.removeFromTop (5);
 
@@ -289,8 +290,9 @@ void RiserLabEditor::resized()
                                            grid.getY() + row * rowHeight,
                                            col == 3 ? grid.getRight() - (grid.getX() + col * cellWidth) : cellWidth,
                                            rowHeight).reduced (4, 1);
-        knobs[(size_t) i].label.setBounds (cell.removeFromTop (16));
-        knobs[(size_t) i].slider.setBounds (cell);
+        knobs[(size_t) i].label.setBounds (cell.removeFromTop (20));
+        cell.removeFromTop (5);
+        knobs[(size_t) i].slider.setBounds (cell.removeFromTop (32));
     }
     area.removeFromTop (1);
     cutToggle.setBounds (area.removeFromTop (24));
