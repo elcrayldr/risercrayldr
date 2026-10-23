@@ -171,7 +171,7 @@ namespace RiserEngine
 
     inline void applyTremolo (juce::AudioBuffer<float>& b, double sr, const RiserSettings& s)
     {
-        const int division = (s.tremoloRate == 0 ? 16 : s.tremoloRate == 1 ? 8 : s.tremoloRate == 2 ? 4 : 2);
+        const int division = (s.tremoloRate == 0 ? 2 : s.tremoloRate == 1 ? 4 : s.tremoloRate == 2 ? 8 : s.tremoloRate == 3 ? 16 : 32);
         const double bpm = juce::jlimit (20.0, 300.0, s.tempoBpm);
         const double cyclesPerSecond = bpm / 60.0 * (4.0 / (double) division);
         const double phaseStep = juce::MathConstants<double>::twoPi * cyclesPerSecond / sr;
