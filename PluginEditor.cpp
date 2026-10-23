@@ -132,6 +132,14 @@ RiserLabEditor::RiserLabEditor (RiserLabProcessor& p)
     captureButton.setMouseCursor (juce::MouseCursor::PointingHandCursor);
     addAndMakeVisible (captureButton);
 
+    previewButton.setButtonText (TXT ("PLAY"));
+    previewButton.onClick = [this] { onPreviewClicked(); };
+    previewButton.setTooltip (TXT ("Escucha el riser generado antes de arrastrarlo al DAW"));
+    previewButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0xff12303a));
+    previewButton.setColour (juce::TextButton::textColourOffId, kAccentBright);
+    previewButton.setColour (juce::TextButton::textColourOnId, kAccentBright);
+    addAndMakeVisible (previewButton);
+
     generateButton.setButtonText (TXT ("✦  GENERAR RISER"));
     generateButton.onClick = [this] { onGenerateClicked(); };
     generateButton.setTooltip (TXT ("Genera el riser con la voz capturada y los parámetros actuales"));
@@ -185,8 +193,8 @@ RiserLabEditor::RiserLabEditor (RiserLabProcessor& p)
         else if (id == "tremoloRate")
             k.slider.textFromValueFunction = [] (double v)
             {
-                const int idx = juce::jlimit (0, 3, (int) std::round (v));
-                const char* values[] = { "1/16", "1/8", "1/4", "1/2" };
+                const int idx = juce::jlimit (0, 4, (int) std::round (v));
+                const char* values[] = { "1/2", "1/4", "1/8", "1/16", "1/32" };
                 return juce::String (values[idx]);
             };
 
@@ -269,7 +277,9 @@ void RiserLabEditor::resized()
     captureButton.setBounds (actions.removeFromLeft (138).reduced (2, 1));
     actions.removeFromLeft (12);
     generateButton.setBounds (actions.removeFromLeft (174).reduced (0, 9));
-    actions.removeFromLeft (14);
+    actions.removeFromLeft (10);
+    previewButton.setBounds (actions.removeFromLeft (112).reduced (0, 9));
+    actions.removeFromLeft (10);
     statusLabel.setBounds (actions.reduced (0, 15));
 
     area.removeFromTop (10);
@@ -343,6 +353,32 @@ void RiserLabEditor::onGenerateClicked()
     }
 }
 
+void RiserLabEditor::onPreviewClicked()
+{
+    if (proc.isPreviewPlaying())
+    {
+        proc.setPreviewPlaying (false);
+        previewButton.setButtonText (TXT ("PLAY"));
+        lastMessage = TXT ("Vista previa detenida.");
+        return;
+    }
+
+    if (! proc.getRiserFile().existsAsFile())
+    {
+        lastMessage = TXT ("Genera un riser antes de escucharlo.");
+        return;
+    }
+
+    proc.setPreviewPlaying (true);
+    if (proc.isPreviewPlaying())
+    {
+        previewButton.setButtonText (TXT ("STOP"));
+        lastMessage = TXT ("Reproduciendo vista previa...");
+    }
+    else
+        lastMessage = TXT ("No hay audio para reproducir.");
+}
+
 void RiserLabEditor::timerCallback()
 {
     const bool capturing = proc.isCapturing();
@@ -352,6 +388,9 @@ void RiserLabEditor::timerCallback()
         captureButton.repaint();
     }
 
+    if (! proc.isPreviewPlaying() && previewButton.getButtonText() != TXT ("PLAY"))
+        previewButton.setButtonText (TXT ("PLAY"));
+
     juce::String msg;
     const double seconds = proc.getCapturedSeconds();
 
@@ -359,6 +398,8 @@ void RiserLabEditor::timerCallback()
         msg = TXT ("Capturando... ") + juce::String (seconds, 1) + " s";
     else if (lastMessage.isNotEmpty())
         msg = lastMessage;
+    else if (proc.isPreviewPlaying())
+        msg = TXT ("Reproduciendo riser...");
     else if (seconds > 0.0)
         msg = TXT ("Capturado: ") + juce::String (seconds, 1) + " s";
     else
