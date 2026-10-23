@@ -48,6 +48,8 @@ public:
 
     // Genera el riser con los parametros actuales. Llamar desde el hilo de la interfaz.
     bool generateRiser (juce::String& errorMessage);
+    void setPreviewPlaying (bool shouldPlay);
+    bool isPreviewPlaying() const { return previewPlaying.load(); }
     juce::File getRiserFile() const;
     std::vector<float> getRiserPeaks (int bins) const;
 
@@ -68,6 +70,8 @@ private:
     mutable juce::CriticalSection riserLock;
     juce::AudioBuffer<float> riserBuffer;
     juce::File riserFile;
+    std::atomic<bool> previewPlaying { false };
+    std::atomic<int> previewPosition { 0 };
 
     int currentProgram = 0;
 
