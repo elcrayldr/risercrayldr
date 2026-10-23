@@ -9,12 +9,59 @@ namespace
         float size, damping, length, deess, lowCut, highCut, drive, echo, dry, reverbMix, reverbType, tremoloRate;
     };
 
+    // 50 presets de fabrica con combinaciones radicalmente distintas.
     const Preset kPresets[] =
     {
-        { "Cl\xc3\xa1sico",         0.80f, 0.40f, 3.0f, 0.60f, 20.0f, 18000.0f, 0.00f, 0.00f, 0.0f, 1.00f, 0.0f, 0.0f },
-        { "Est\xc3\xa9reo",          1.00f, 0.20f, 5.0f, 0.70f, 80.0f, 16000.0f, 0.00f, 0.25f, 0.0f, 0.85f, 1.0f, 1.0f },
-        { "Oscuro saturado",        0.60f, 0.80f, 2.5f, 0.50f, 120.0f, 8000.0f, 0.60f, 0.00f, 0.0f, 0.80f, 2.0f, 2.0f },
-        { "Eco brillante",          0.70f, 0.30f, 3.5f, 0.80f, 60.0f, 19000.0f, 0.10f, 0.50f, 0.0f, 0.90f, 1.0f, 0.0f }
+        { "CLASSIC LIFT", 0.25f, 0.10f, 1.00f, 0.10f, 20.00f, 6000.00f, 0.00f, 0.00f, 0.25f, 0.30f, 0.0f, 0.0f },
+        { "NEON HALO", 0.45f, 0.05f, 1.50f, 0.35f, 35.00f, 10000.00f, 0.15f, 0.45f, 0.00f, 0.55f, 1.0f, 1.0f },
+        { "DARK MATTER", 0.72f, 0.60f, 2.00f, 0.60f, 60.00f, 14000.00f, 0.35f, 0.35f, 0.00f, 0.75f, 2.0f, 2.0f },
+        { "LASER GATE", 0.95f, 0.85f, 2.50f, 0.80f, 90.00f, 18000.00f, 0.60f, 0.95f, 0.00f, 0.90f, 1.0f, 3.0f },
+        { "ALIEN CHOIR", 0.58f, 0.35f, 3.00f, 0.95f, 120.00f, 9000.00f, 0.85f, 0.25f, 0.25f, 1.00f, 0.0f, 4.0f },
+        { "CYBER STORM", 0.88f, 0.20f, 3.50f, 0.25f, 180.00f, 6000.00f, 0.25f, 0.85f, 0.00f, 0.65f, 2.0f, 2.0f },
+        { "GLASS CATHEDRAL", 0.35f, 0.15f, 4.00f, 0.50f, 250.00f, 10000.00f, 0.50f, 0.15f, 0.00f, 0.40f, 1.0f, 1.0f },
+        { "SUB ZERO", 0.99f, 0.75f, 5.00f, 0.70f, 400.00f, 14000.00f, 0.75f, 0.10f, 0.00f, 0.85f, 0.0f, 4.0f },
+        { "ACID BLOOM", 0.64f, 0.90f, 6.00f, 0.00f, 80.00f, 18000.00f, 0.10f, 0.65f, 0.25f, 0.20f, 2.0f, 3.0f },
+        { "BLACK HOLE", 0.18f, 0.45f, 7.50f, 0.40f, 150.00f, 9000.00f, 0.95f, 0.55f, 0.00f, 0.95f, 1.0f, 0.0f },
+        { "STARFALL", 0.45f, 0.75f, 2.50f, 0.60f, 90.00f, 8000.00f, 0.85f, 0.10f, 0.00f, 0.75f, 1.0f, 3.0f },
+        { "DIGITAL ANGEL", 0.72f, 0.90f, 3.00f, 0.80f, 120.00f, 12000.00f, 0.25f, 0.65f, 0.00f, 0.90f, 2.0f, 4.0f },
+        { "BROKEN SIGNAL", 0.95f, 0.45f, 3.50f, 0.95f, 180.00f, 16000.00f, 0.50f, 0.55f, 0.25f, 1.00f, 1.0f, 2.0f },
+        { "HYPERSPACE", 0.58f, 0.10f, 4.00f, 0.25f, 250.00f, 19500.00f, 0.75f, 0.00f, 0.00f, 0.65f, 0.0f, 1.0f },
+        { "VOID SCREAM", 0.88f, 0.05f, 5.00f, 0.50f, 400.00f, 15000.00f, 0.10f, 0.45f, 0.00f, 0.40f, 2.0f, 4.0f },
+        { "METAL RAIN", 0.35f, 0.60f, 6.00f, 0.70f, 80.00f, 8000.00f, 0.95f, 0.35f, 0.00f, 0.85f, 1.0f, 3.0f },
+        { "PHANTOM TAIL", 0.99f, 0.85f, 7.50f, 0.00f, 150.00f, 12000.00f, 0.00f, 0.95f, 0.25f, 0.20f, 0.0f, 0.0f },
+        { "PLASMA BURST", 0.64f, 0.35f, 1.00f, 0.40f, 20.00f, 16000.00f, 0.15f, 0.25f, 0.00f, 0.95f, 2.0f, 0.0f },
+        { "DEEP ORBIT", 0.18f, 0.20f, 1.50f, 0.10f, 35.00f, 19500.00f, 0.35f, 0.85f, 0.00f, 0.30f, 1.0f, 1.0f },
+        { "GLITCH RIOT", 0.25f, 0.15f, 2.00f, 0.35f, 60.00f, 15000.00f, 0.60f, 0.15f, 0.00f, 0.55f, 0.0f, 2.0f },
+        { "CRYSTAL DROP", 0.72f, 0.35f, 4.00f, 0.95f, 250.00f, 10000.00f, 0.10f, 0.25f, 0.25f, 1.00f, 2.0f, 1.0f },
+        { "GHOST MACHINE", 0.95f, 0.20f, 5.00f, 0.25f, 400.00f, 14000.00f, 0.95f, 0.85f, 0.00f, 0.65f, 1.0f, 4.0f },
+        { "NIGHT DRIVE", 0.58f, 0.15f, 6.00f, 0.50f, 80.00f, 18000.00f, 0.00f, 0.15f, 0.00f, 0.40f, 0.0f, 3.0f },
+        { "QUANTUM FLARE", 0.88f, 0.75f, 7.50f, 0.70f, 150.00f, 9000.00f, 0.15f, 0.10f, 0.00f, 0.85f, 2.0f, 0.0f },
+        { "DYSTOPIA", 0.35f, 0.90f, 1.00f, 0.00f, 20.00f, 6000.00f, 0.35f, 0.65f, 0.25f, 0.20f, 1.0f, 0.0f },
+        { "HEAVEN'S GATE", 0.99f, 0.45f, 1.50f, 0.40f, 35.00f, 10000.00f, 0.60f, 0.55f, 0.00f, 0.95f, 0.0f, 1.0f },
+        { "RITUAL", 0.64f, 0.10f, 2.00f, 0.10f, 60.00f, 14000.00f, 0.85f, 0.00f, 0.00f, 0.30f, 2.0f, 2.0f },
+        { "WARP SPEED", 0.18f, 0.05f, 2.50f, 0.35f, 90.00f, 18000.00f, 0.25f, 0.45f, 0.00f, 0.55f, 1.0f, 3.0f },
+        { "DARK ANGEL", 0.25f, 0.60f, 3.00f, 0.60f, 120.00f, 9000.00f, 0.50f, 0.35f, 0.25f, 0.75f, 0.0f, 4.0f },
+        { "FROZEN LASER", 0.45f, 0.85f, 3.50f, 0.80f, 180.00f, 6000.00f, 0.75f, 0.95f, 0.00f, 0.90f, 1.0f, 2.0f },
+        { "CHROME WAVE", 0.95f, 0.05f, 7.50f, 0.50f, 150.00f, 12000.00f, 0.35f, 0.45f, 0.00f, 0.40f, 1.0f, 0.0f },
+        { "RED GIANT", 0.58f, 0.60f, 1.00f, 0.70f, 20.00f, 16000.00f, 0.60f, 0.35f, 0.00f, 0.85f, 0.0f, 0.0f },
+        { "VHS NIGHTMARE", 0.88f, 0.85f, 1.50f, 0.00f, 35.00f, 19500.00f, 0.85f, 0.95f, 0.25f, 0.20f, 2.0f, 1.0f },
+        { "SYNTH TITAN", 0.35f, 0.35f, 2.00f, 0.40f, 60.00f, 15000.00f, 0.25f, 0.25f, 0.00f, 0.95f, 1.0f, 2.0f },
+        { "SHATTERED SKY", 0.99f, 0.20f, 2.50f, 0.10f, 90.00f, 8000.00f, 0.50f, 0.85f, 0.00f, 0.30f, 0.0f, 3.0f },
+        { "ALIEN ENGINE", 0.64f, 0.15f, 3.00f, 0.35f, 120.00f, 12000.00f, 0.75f, 0.15f, 0.00f, 0.55f, 2.0f, 4.0f },
+        { "DREAM EATER", 0.18f, 0.75f, 3.50f, 0.60f, 180.00f, 16000.00f, 0.10f, 0.10f, 0.25f, 0.75f, 1.0f, 2.0f },
+        { "ELECTRIC TEMPLE", 0.25f, 0.90f, 4.00f, 0.80f, 250.00f, 19500.00f, 0.95f, 0.65f, 0.00f, 0.90f, 0.0f, 1.0f },
+        { "TIME FRACTURE", 0.45f, 0.45f, 5.00f, 0.95f, 400.00f, 15000.00f, 0.00f, 0.55f, 0.00f, 1.00f, 1.0f, 4.0f },
+        { "VOID RUNNER", 0.72f, 0.10f, 6.00f, 0.25f, 80.00f, 8000.00f, 0.15f, 0.00f, 0.00f, 0.65f, 2.0f, 3.0f },
+        { "ULTRAVIOLET", 0.58f, 0.90f, 2.00f, 0.00f, 60.00f, 14000.00f, 0.50f, 0.65f, 0.25f, 0.20f, 0.0f, 2.0f },
+        { "BLACK ICE", 0.88f, 0.45f, 2.50f, 0.40f, 90.00f, 18000.00f, 0.75f, 0.55f, 0.00f, 0.95f, 2.0f, 3.0f },
+        { "INFERNO RISE", 0.35f, 0.10f, 3.00f, 0.10f, 120.00f, 9000.00f, 0.10f, 0.00f, 0.00f, 0.30f, 1.0f, 4.0f },
+        { "STAR ENGINE", 0.99f, 0.05f, 3.50f, 0.35f, 180.00f, 6000.00f, 0.95f, 0.45f, 0.00f, 0.55f, 0.0f, 2.0f },
+        { "GHOST FREQUENCY", 0.64f, 0.60f, 4.00f, 0.60f, 250.00f, 10000.00f, 0.00f, 0.35f, 0.25f, 0.75f, 2.0f, 1.0f },
+        { "NEBULA CRASH", 0.18f, 0.85f, 5.00f, 0.80f, 400.00f, 14000.00f, 0.15f, 0.95f, 0.00f, 0.90f, 1.0f, 4.0f },
+        { "RADIANT CHAOS", 0.25f, 0.35f, 6.00f, 0.95f, 80.00f, 18000.00f, 0.35f, 0.25f, 0.00f, 1.00f, 0.0f, 3.0f },
+        { "TUNNEL VISION", 0.45f, 0.20f, 7.50f, 0.25f, 150.00f, 9000.00f, 0.60f, 0.85f, 0.00f, 0.65f, 1.0f, 0.0f },
+        { "FINAL BOSS", 0.72f, 0.15f, 1.00f, 0.50f, 20.00f, 6000.00f, 0.85f, 0.15f, 0.25f, 0.40f, 2.0f, 0.0f },
+        { "ENDLESS ASCENT", 0.95f, 0.75f, 1.50f, 0.70f, 35.00f, 10000.00f, 0.25f, 0.10f, 0.00f, 0.85f, 1.0f, 1.0f }
     };
 
     constexpr int kNumPresets = (int) (sizeof (kPresets) / sizeof (kPresets[0]));
@@ -50,7 +97,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout RiserLabProcessor::createLay
     l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { "reverbType", 1 },
                                 "Reverb Type", juce::StringArray { "Hall", "Plate", "Room" }, 0));
     l.add (std::make_unique<F> (juce::ParameterID { "tremoloRate", 1 }, "Tremolo Rate",
-                                R (0.0f, 3.0f, 1.0f), 0.0f));
+                                R (0.0f, 4.0f, 1.0f), 0.0f));
     l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "reverbEnabled", 1 },
                                 "Reverb On", true));
     l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "cut", 1 },
@@ -93,6 +140,33 @@ void RiserLabProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 {
     juce::ScopedNoDenormals noDenormals;
 
+    // Vista previa del riser generado por la salida del plugin.
+    if (previewPlaying.load())
+    {
+        juce::CriticalSection::ScopedTryLockType lock (riserLock);
+        if (lock.isLocked() && riserBuffer.getNumSamples() > 0)
+        {
+            const int pos = previewPosition.load();
+            const int count = juce::jmin (buffer.getNumSamples(), riserBuffer.getNumSamples() - pos);
+            if (count > 0)
+            {
+                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                {
+                    float* dst = buffer.getWritePointer (ch);
+                    const float* src = riserBuffer.getReadPointer (juce::jmin (ch, riserBuffer.getNumChannels() - 1), pos);
+                    juce::FloatVectorOperations::copy (dst, src, count);
+                    juce::FloatVectorOperations::clear (dst + count, buffer.getNumSamples() - count);
+                }
+                previewPosition = pos + count;
+            }
+            if (count <= 0 || previewPosition.load() >= riserBuffer.getNumSamples())
+                previewPlaying = false;
+        }
+        else
+            previewPlaying = false;
+        return;
+    }
+
     // El audio pasa sin cambios; si esta capturando, ademas se copia.
     if (! capturing.load())
         return;
@@ -130,6 +204,26 @@ void RiserLabProcessor::startCapture()
 void RiserLabProcessor::stopCapture()
 {
     capturing = false;
+}
+
+void RiserLabProcessor::setPreviewPlaying (bool shouldPlay)
+{
+    if (shouldPlay)
+    {
+        juce::ScopedLock sl (riserLock);
+        if (riserBuffer.getNumSamples() <= 0)
+        {
+            previewPlaying = false;
+            return;
+        }
+        previewPosition = 0;
+        previewPlaying = true;
+    }
+    else
+    {
+        previewPlaying = false;
+        previewPosition = 0;
+    }
 }
 
 double RiserLabProcessor::getCapturedSeconds() const
