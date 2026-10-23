@@ -45,11 +45,12 @@ private:
     void timerCallback() override;
     void onCaptureClicked();
     void onGenerateClicked();
+    void onPreviewClicked();
 
     RiserLabProcessor& proc;
 
     CaptureControl captureButton;
-    juce::TextButton generateButton;
+    juce::TextButton generateButton, previewButton;
     juce::Label statusLabel;
     juce::ComboBox presetBox, reverbTypeBox;
     juce::ToggleButton reverbToggle, cutToggle;
